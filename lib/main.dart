@@ -16,17 +16,15 @@ class MyApp extends StatelessWidget {
     const String clientId =
         String.fromEnvironment('CLIENT_ID', defaultValue: '');
 
-    //Instantiate an OAuth2Client...
-    GoogleOAuth2Client client = GoogleOAuth2Client(
-        customUriScheme:
-            'io.liquid.example', //Must correspond to the AndroidManifest's "android:scheme" attribute
-        redirectUri:
-            'io.liquid.example:/oauth2redirect' //Can be any URI, but the scheme part must correspond to the customeUriScheme
-        );
-
     //Then, instantiate the helper passing the previously instantiated client
-    OAuth2Helper oauth2Helper = OAuth2Helper(client,
-        grantType: OAuth2Helper.AUTHORIZATION_CODE, clientId: clientId,
+    OAuth2Helper oauth2Helper = OAuth2Helper(
+        GoogleOAuth2Client(
+            customUriScheme:
+                'io.liquid.example', //Must correspond to the AndroidManifest's "android:scheme" attribute
+            redirectUri: 'io.liquid.example:/oauth2redirect' //Can be any URI, but the scheme part must correspond to the customeUriScheme
+            ),
+        grantType: OAuth2Helper.AUTHORIZATION_CODE,
+        clientId: clientId,
         //clientSecret: 'your_client_secret',
         scopes: ['https://www.googleapis.com/auth/userinfo.email']);
 
@@ -76,7 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<bool> perform() async {
     try {
-      await Provider.of<OAuth2Helper>(context, listen: false).getToken();
+      await Provider.of<OAuth2Helper>(context, listen: false)
+          .get('https://www.googleapis.com/oauth2/v2/userinfo');
       return Future.value(true);
     } catch (error, stacktrace) {
       return Future.error(error, stacktrace);
